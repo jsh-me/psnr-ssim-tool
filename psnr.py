@@ -26,23 +26,27 @@ def main():
         total = 0
 
         for i in tqdm(range(1, dir_len)):
-            o_image = "%05d" % i +".jpg"
-            c_image = "%05d" % i +".png"
+            try:
+                o_image = "%05d" % i +".png"
+                c_image = "%05d" % i +".png"
 
-            original = cv2.imread(args.original + o_image)
-            contrast = cv2.imread(args.contrast + c_image)
+                original = cv2.imread(args.original + o_image)
+                contrast = cv2.imread(args.contrast + c_image)
 
-            o_height, o_width, o_channel = original.shape
-            contrast = cv2.resize(contrast, dsize=(o_width,o_height), interpolation=cv2.INTER_AREA)
+                o_height, o_width, o_channel = original.shape
+                contrast = cv2.resize(contrast, dsize=(o_width,o_height), interpolation=cv2.INTER_AREA)
 
-            total += psnr(original, contrast)
+                total += psnr(original, contrast)
+
+            except Exception as e:
+                    print(str(e) + ": Total count mismatch!!!!")
 
             #if(i%100 == 0):
             #     print("PSNR: {}".format(psnr(original, contrast)))
 
         video_psnr_mean = total / dir_len
         print("Video PSNR Mean : {}".format(video_psnr_mean))
-        
+
     else:
         original = cv2.imread(args.original)
         contrast = cv2.imread(args.contrast)
@@ -54,4 +58,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
