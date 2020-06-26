@@ -17,40 +17,44 @@ def main():
         dir_len = len(os.walk(args.original).__next__()[2])
         print("total file number:{}".format(dir_len))
         total = 0
-        
+
         for i in tqdm(range(1, dir_len)):
-            o_image = "%05d" % i +".jpg"
-            c_image = "%05d" % i +".png"
+            try:
+                o_image = "%05d" % i +".png"
+                c_image = "%05d" % i +".png"
 
-            original = cv2.imread(args.original + o_image)
-            contrast = cv2.imread(args.contrast + c_image)
+                original = cv2.imread(args.original + o_image)
+                contrast = cv2.imread(args.contrast + c_image)
 
-            o_height, o_width, o_channel = original.shape
-            contrast = cv2.resize(contrast, dsize=(o_width,o_height), interpolation=args.interpolation)
-            
-    
-            o_gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-            c_gray = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)
+                o_height, o_width, o_channel = original.shape
+                contrast = cv2.resize(contrast, dsize=(o_width,o_height), interpolation=args.interpolation)
 
-            (score, diff) = compare_ssim(o_gray, c_gray, full = True)
-            
-            diff = (diff*255).astype('uint8')
-            total+=score
-            
-            
+                o_gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+                c_gray = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)
+
+                (score, diff) = compare_ssim(o_gray, c_gray, full = True)
+
+                diff = (diff*255).astype('uint8')
+                total+=score
+
+            except Exception as e:
+                    print(str(e) + ": Total count mismatch!!!!")
+
+
+
+
             #if(i%100 == 0):
             #     print("SSIM: {}".format(score))
-                    
+
         video_ssim_mean = total / dir_len
         print("Video SSIM Mean : {}".format(video_ssim_mean))
-    
+
     else:
         original = cv2.imread(args.original)
         contrast = cv2.imread(args.contrast)
 
         o_height, o_width, o_channel = original.shape
         contrast = cv2.resize(contrast, dsize=(o_width, o_height), interpolation=args.interpolation)
-
 
         o_gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
         c_gray = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)
